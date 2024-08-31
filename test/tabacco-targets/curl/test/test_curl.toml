@@ -1,0 +1,9 @@
+[curl]
+
+[curl.tests.test]
+kind = "simple-run"
+args = ["-X", "POST", "-d", "{\"title\": \"Curl POST\",\"body\": \"Curl POST example body\",\"userId\":1}", "http://127.0.0.1:12346/foo/bar"]
+fixtures = ["curl_server"]
+expected_stdout = """
+Hello from the curl test
+"""

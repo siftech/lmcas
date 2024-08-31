@@ -1,0 +1,336 @@
+# Debloated behaves differently than bloated
+[basename]
+
+[basename.tests.remove-dottxt]
+kind = "simple-run"
+args = ["--suffix=.txt", "foo.txt"]
+expected_stdout = "foo\n"
+keywords = []
+
+[basename.tests.retain-dotjson]
+kind = "simple-run"
+args = ["--suffix=.txt", "bar.json"]
+expected_stdout = "bar.json\n"
+
+[basename.tests.remove-foo]
+kind = "simple-run"
+args = ["--suffix=.txt", "foo/bar.json"]
+expected_stdout = "bar.json\n"
+
+[basename.tests.multiple-args]
+kind = "simple-run"
+args = ["--suffix=.txt", "foo", "bar.txt"]
+expected_stdout = "foo\nbar\n"
+keywords = []
+
+[basename.tests.z-flag]
+kind = "simple-run"
+args = ["--suffix=.txt", "-z", "foo", "bar.txt"]
+expected_stdout = "foo\u0000bar\u0000"
+should_pass_debloated = false
+
+# Debloated behaves differently than bloated
+[basenc]
+
+[basenc.tests.empty]
+kind = "simple-run"
+args = ["--base64"]
+stdin = ""
+expected_stdout = ""
+
+[basenc.tests.hello-world]
+kind = "simple-run"
+args = ["--base64"]
+stdin = "Hello, world!"
+expected_stdout = "SGVsbG8sIHdvcmxkIQ==\n"
+
+[basenc.tests.decode-hello-world]
+kind = "simple-run"
+args = ["--base64", "-d"]
+stdin = "SGVsbG8sIHdvcmxkIQ==\n"
+expected_stdout = "Hello, world!"
+should_pass_debloated = false
+
+[chown]
+
+# Debloated behavior is different than bloated
+[comm]
+
+[comm.tests.pass-3]
+kind = "simple-run"
+fixtures = ["misc_text_file_dir"]
+args = ["-12", "-3", "dracula-oneline.txt", "dracula-sorted.txt"]
+expected_stdout = ""
+should_pass_debloated = false
+
+[comm.tests.oneline]
+kind = "simple-run"
+fixtures = ["misc_text_file_dir"]
+args = ["-12", "dracula-oneline.txt", "dracula-sorted.txt"]
+expected_stdout = "\"Count Dracula?\" He bowed in a courtly way as he replied:--\n"
+
+[comm.tests.abc]
+kind = "simple-run"
+fixtures = ["misc_text_file_dir"]
+args = ["-12", "abbc.txt", "bcd.txt"]
+expected_stdout = "b\nc\n"
+
+[date]
+
+[date.tests.no-args]
+kind = "simple-run"
+args = ["-d", "Mon Jan 2 03:04:05 PM 2006"]
+expected_stdout = "Mon Jan  2 15:04:05 UTC 2006\n"
+keywords = []
+
+[date.tests.date-means-echo-right]
+kind = "simple-run"
+args = ["-d", "Mon Jan 2 03:04:05 PM 2006", "+Hello, world!"]
+expected_stdout = "Hello, world!\n"
+
+[date2]
+
+[date2.tests.set-date_bloated]
+kind = "simple-run"
+args = ["-R", "010215042006.05"]
+expected_stdout = "Mon, 02 Jan 2006 15:04:05 +0000\n"
+# This command is only deterministic (i.e. not depending on the current time)
+# when used to set the time, which is disallowed. Unfortunately, it puts argv[0]
+# in the error, so we don't have a fixed string to compare against.
+expected_status = 1
+expected_stderr = false
+# expected_stderr = "/tmp/date: cannot set date: Operation not permitted\n"
+
+
+[du]
+
+[du.tests.5MB-dir]
+kind = "simple-run"
+fixtures = ["du_5MB_dir"]
+args = ["-bsh", "."]
+# This is 5.1 instead of 5.0, because the directory itself and the entries
+# consume some space.
+expected_stdout = "5.1M\t.\n"
+
+
+# Debloated behaves differently than bloated
+[echo]
+
+[echo.tests.foobar]
+kind = "simple-run"
+args = ["-E", "foo\\nbar"]
+expected_stdout = "foo\\nbar\n"
+
+[echo.tests.n-flag]
+kind = "simple-run"
+args = ["-E", "-n", "foo\\nbar"]
+expected_stdout = "foo\\nbar"
+should_pass_debloated = false
+
+
+# Debloated behaved differently than bloated
+[fmt]
+
+[fmt.tests.para]
+kind = "simple-run"
+fixtures = ["misc_text_file_dir"]
+args = ["-c", "fmt.txt"]
+expected_stdout = """
+    "I see," I said. "You want big things that you can make your
+teeth meet in?  How would you like to breakfast on elephant?" "What
+ridiculous nonsense you are talking!" He was getting too wide awake,
+so I thought I would press him hard. "I wonder," I said reflectively,
+"what an elephant's soul is like!" The effect I desired was obtained,
+for he at once fell from his high-horse and became a child again. "I
+don't want an elephant's soul, or any soul at all!" he said. For a
+few moments he sat despondently. Suddenly he jumped to his feet, with
+his eyes blazing and all the signs of intense cerebral excitement. "To
+hell with you and your souls!" he shouted. "Why do you plague me about
+souls? Haven't I got enough to worry, and pain, and distract me already,
+without thinking of souls!" He looked so hostile that I thought he was
+in for another homicidal fit, so I blew my whistle.
+"""
+
+[fmt.tests.doesnt-take-new-flags]
+kind = "simple-run"
+fixtures = ["misc_text_file_dir"]
+args = ["-c", "--width=80", "fmt.txt"]
+expected_stdout = """
+    "I see," I said. "You want big things that you can make your teeth
+meet in?  How would you like to breakfast on elephant?" "What ridiculous
+nonsense you are talking!" He was getting too wide awake, so I thought I
+would press him hard. "I wonder," I said reflectively, "what an elephant's
+soul is like!" The effect I desired was obtained, for he at once fell from
+his high-horse and became a child again. "I don't want an elephant's soul,
+or any soul at all!" he said. For a few moments he sat despondently. Suddenly
+he jumped to his feet, with his eyes blazing and all the signs of intense
+cerebral excitement. "To hell with you and your souls!" he shouted. "Why
+do you plague me about souls? Haven't I got enough to worry, and pain, and
+distract me already, without thinking of souls!" He looked so hostile that
+I thought he was in for another homicidal fit, so I blew my whistle.
+"""
+should_pass_debloated = false
+
+# Debloated binary behaves differently than bloated
+[fold]
+
+[fold.tests.para]
+kind = "simple-run"
+fixtures = ["misc_text_file_dir"]
+args = ["-w30", "fmt.txt"]
+expected_stdout = """
+    "I see," I said. "You want
+ big things that you can make 
+your teeth meet in?
+How would you like to breakfas
+t on elephant?" "What ridiculo
+us nonsense you are talking!" 
+He was getting too wide awake,
+ so I thought I would press hi
+m hard. "I wonder," I said ref
+lectively, "what an elephant's
+ soul is like!" The effect I d
+esired was obtained, for he at
+ once fell from his high-horse
+ and became a child again. "I 
+don't want an elephant's soul,
+ or any soul at all!" he said.
+ For a few moments he sat desp
+ondently. Suddenly he jumped t
+o his feet, with his eyes blaz
+ing and all the signs of inten
+se cerebral excitement. "To he
+ll with you and your souls!" h
+e shouted. "Why do you plague 
+me about souls? Haven't I got 
+enough to worry, and pain, and
+ distract me already, without 
+thinking of souls!" He looked 
+so hostile that I thought he w
+as in for another homicidal fi
+t, so I blew my whistle.
+"""
+
+[fold.tests.s-flag]
+kind = "simple-run"
+fixtures = ["misc_text_file_dir"]
+args = ["-w30", "-s", "dracula-para.txt"]
+expected_stdout = "_5 November, morning._--Let \nme be accurate in everything, \nfor though you\nand I have seen some strange \nthings together, you may at \nthe first think\nthat I, Van Helsing, am \nmad--that the many horrors \nand the so long\nstrain on nerves has at the \nlast turn my brain.\n"
+should_pass_debloated = false
+
+# Debloated behaves differently than bloated
+[head]
+
+[head.tests.para]
+kind = "simple-run"
+fixtures = ["misc_text_file_dir"]
+args = ["-n3", "dracula-para.txt"]
+expected_stdout = """
+_5 November, morning._--Let me be accurate in everything, for though you
+and I have seen some strange things together, you may at the first think
+that I, Van Helsing, am mad--that the many horrors and the so long
+"""
+
+[head.tests.z-flag]
+kind = "simple-run"
+fixtures = ["misc_text_file_dir"]
+args = ["-n3", "-z", "abbc0.txt"]
+expected_stdout = "a\u0000b\u0000b\u0000"
+should_pass_debloated = false
+
+# Debloated behaves differently than bloated
+# Requires a fixture not yet implemented
+[id]
+
+[id.tests.noargs]
+kind = "simple-run"
+args = ["-G", "0"]
+expected_stdout = "0 1 2 3 4 6 10 11 20 26 27\n"
+
+[id.tests.uid-1000]
+# This depends on running in the sandbox!!!
+kind = "simple-run"
+args = ["-G", "30001"]
+expected_stdout = "30000\n"
+broken = true
+keywords = ["requires-container"]
+
+[id.tests.n-flag]
+kind = "simple-run"
+args = ["-G", "-n"]
+expected_stdout = "nixbld\n"
+should_pass_debloated = false
+keywords = ["requires-container"]
+
+# Uses a custom test, see test_uwisc.py.
+[kill]
+
+# Uses a custom test, see test_uwisc.py.
+[realpath-P]
+
+# Uses a custom test, see test_uwisc.py.
+[realpath-z]
+
+[rm]
+
+# Unable to debloat
+[sort] 
+# Tests fail because `opt` crashed with SIGABT on the debloated construction's constant conversion pass
+
+[sort.tests.ab]
+kind = "simple-run"
+args = ["-u"]
+stdin = "c d\na b\ng h\ne f" 
+expected_stdout="a b\nc d\ne f\ng h\n"
+
+[sort.tests.fmtdrac]
+kind = "simple-run"
+args = ["-u", "fmt.txt", "dracula-para.txt"]
+fixtures = ["misc_text_file_dir"]
+expected_stdout = """
+    "I see," I said. "You want big things that you can make your teeth meet in?
+How would you like to breakfast on elephant?" "What ridiculous nonsense you are talking!" He was getting too wide awake, so I thought I would press him hard. "I wonder," I said reflectively, "what an elephant's soul is like!" The effect I desired was obtained, for he at once fell from his high-horse and became a child again. "I don't want an elephant's soul, or any soul at all!" he said. For a few moments he sat despondently. Suddenly he jumped to his feet, with his eyes blazing and all the signs of intense cerebral excitement. "To hell with you and your souls!" he shouted. "Why do you plague me about souls? Haven't I got enough to worry, and pain, and distract me already, without thinking of souls!" He looked so hostile that I thought he was in for another homicidal fit, so I blew my whistle.
+_5 November, morning._--Let me be accurate in everything, for though you
+and I have seen some strange things together, you may at the first think
+strain on nerves has at the last turn my brain.
+that I, Van Helsing, am mad--that the many horrors and the so long
+"""
+should_pass_debloated = false
+
+# Debloated binary behaves differently than bloated
+[uniq] 
+
+[uniq.tests.abbc]
+kind = "simple-run"
+fixtures = ["misc_text_file_dir"]
+args = ["-d", "abbc.txt"]
+expected_stdout = "b\n"
+
+# Should not pass because it's debloated with abbc.txt
+[uniq.tests.bcd]
+kind = "simple-run"
+fixtures = ["misc_text_file_dir"]
+args = ["-d", "abbc.txt", "bcd.txt"]
+expected_stdout = ""
+should_pass_debloated = false
+
+[uniq.tests.c-flag]
+kind = "simple-run"
+fixtures = ["misc_text_file_dir"]
+args = ["-d", "abbc.txt", "-c", "abbc.txt"]
+expected_stdout = "      2 b\n"
+should_pass_debloated = false
+
+[wc]
+
+[wc.tests.count_fmttxt]
+kind = "simple-run"
+fixtures = ["misc_text_file_dir"]
+args = ["-l", "fmt.txt"]
+expected_stdout = "2 fmt.txt\n"
+
+[wc.tests.count_draconelinetxt]
+kind = "simple-run"
+fixtures = ["misc_text_file_dir"]
+args = ["-l", "dracula-oneline.txt"]
+expected_stdout = "1 dracula-oneline.txt\n"

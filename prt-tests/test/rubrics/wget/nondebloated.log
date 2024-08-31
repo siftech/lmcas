@@ -1,0 +1,4 @@
+nondebloated: missing URL
+Usage: nondebloated [OPTION]... [URL]...
+
+Try `nondebloated --help' for more options.

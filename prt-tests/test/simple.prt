@@ -1,0 +1,100 @@
+## This test corresponds to the "simple" LMCAS debloating tutorial
+
+do "./defaults.pl" || die "Can't do './defaults.pl': $@";
+
+## -------------------------------- ## --------------------------------
+## These are vbles that change for each test
+
+#$numoptimi=2;
+#$games_per_optimi=2;
+#$games_folder = "/openshell/code/test/fw-game-configs/fw-smoke-test";	
+
+## -------------------------------- ## --------------------------------
+
+do "./lmcas.pl" || die "Can't do './lmcas.pl': $@";
+
+do "./common.pl" || die "Can't do './common.pl': $@";
+
+$test = {
+    defaultIgnore => 0,
+    keywords => [ qw / neckminer tabacco tutorial / ],
+    agents => [
+    	&printenv,
+    	&print_results_dir,
+    	#@kill_my_dockers,
+    	#@kill_stray_local_processes,	# this will get the mp-oprs if run locally
+	@start_lmcas_container,
+        @build_main,
+
+    	echo("Testing original main"), 
+	{ name         => "main",
+          command      => [ "docker","exec","lmcas","bash","-c","cd example; ./main" ], 
+	  exit_code => 1},	# expected error!
+	{
+          name         => "main-h",
+          command      => [ "docker","exec","lmcas","bash","-c","cd example; ./main -h" ],
+          # default line comparo will require all rubric lines to appear in test output verbatim; extra lines allowed
+          complete_before_continuing =>1,
+    	},
+	{
+          name         => "main-l",
+          command      => [ "docker","exec","lmcas","bash","-c","cd example; ./main -l" ],
+          complete_before_continuing =>1,
+    	},
+    	echo("Debloating..."), 
+	{	# this one we just make sure it returns zero... the output of tabacco changes too much to check it
+          name         => "tabacco",
+          command      => [ "timeout","2m","$ENV{'PRT_PATH'}/timestamp","docker","exec","lmcas","bash","-c", "cd example; tabacco -o debloated spec.json" ],
+	  comparo      => undef,
+          complete_before_continuing =>1,
+    	},
+    	echo("Testing debloated program"), 
+
+	{ name         => "debloated",
+          command      => [ "docker","exec","lmcas","bash","-c","cd example; ./debloated" ],
+	  exit_code    => 100 },
+
+	{ name         => "debloated-h",
+          command      => [ "docker","exec","lmcas","bash","-c","cd example; ./debloated -h" ], },
+
+	{ name         => "debloated-l",
+          command      => [ "docker","exec","lmcas","bash","-c","cd example; ./debloated -l" ], 
+	  exit_code    => 100 },
+
+	{ name         => "debloated-l-l-l-l",
+          command      => [ "docker","exec","lmcas","bash","-c","cd example; ./debloated -l -l -l -l" ], 
+	  exit_code    => 100 },
+
+	{ name         => "debloated-invalid-option",
+          command      => [ "docker","exec","lmcas","bash","-c","cd example; ./debloated -this-is-an-invalid-option" ],
+	  exit_code    => 100,
+          complete_before_continuing =>1, },
+
+		# this is where the tutorial ends, but the README had more
+		# One can also run the TaBaCCo driver without running the debloating passes, to
+		# get a binary that is linked similarly (to avoid a dependence on the container
+		# this release of TaBaCCo is shipped in), but with full functionality.
+
+    	echo("Debloating with -N to test original functionality..."), 
+	{	# this one we just make sure it returns zero... the output of tabacco changes too much to check it
+          name         => "tabacco",
+          command      => [ "timeout","2m","$ENV{'PRT_PATH'}/timestamp","docker","exec","lmcas","bash","-c", "cd example; tabacco -o nondebloated -N spec.json" ],
+	  comparo      => undef,
+          complete_before_continuing =>1,
+    	},
+    	echo("Testing nondebloated program"), 
+	{ name         => "nondebloated",
+          command      => [ "docker","exec","lmcas","bash","-c","cd example; ./nondebloated" ], 
+	  exit_code => 1},	# expected error!
+
+	{ name         => "nondebloated-h",
+          command      => [ "docker","exec","lmcas","bash","-c","cd example; ./nondebloated -h" ], },
+
+	{ name         => "nondebloated-l",
+          command      => [ "docker","exec","lmcas","bash","-c","cd example; ./nondebloated -l" ], },
+
+        echo("Test complete!")
+	],
+};
+
+$test;

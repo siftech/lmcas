@@ -1,0 +1,83 @@
+diff --git a/shared/compiler.go b/shared/compiler.go
+index b9f0261..a0cd46e 100644
+--- a/shared/compiler.go
++++ b/shared/compiler.go
+@@ -394,7 +394,7 @@ func execCompile(compilerExecName string, pr ParserResult, wg *sync.WaitGroup, o
+ 
+     if isLinking {
+         LogDebug(fmt.Sprintf("stuffing linker flags into final executable: args=%v out=%v", pr.LinkArgs, pr.OutputFilename))
+-        attachLinkerArgsToObject(pr.LinkArgs, pr.OutputFilename)
++        attachLinkerArgsToObject(pr.LinkArgsWithoutObjects, pr.OutputFilename)
+     }
+ }
+ 
+diff --git a/shared/parser.go b/shared/parser.go
+index 5a280fe..3f6f3c9 100644
+--- a/shared/parser.go
++++ b/shared/parser.go
+@@ -52,6 +52,7 @@ type ParserResult struct {
+ 	OutputFilename   string
+ 	CompileArgs      []string
+ 	LinkArgs         []string
++	LinkArgsWithoutObjects []string
+ 	ForbiddenFlags   []string
+ 	IsVerbose        bool
+ 	IsDependencyOnly bool
+@@ -71,6 +72,7 @@ ObjectFiles:       %v
+ OutputFilename:    %v
+ CompileArgs:       %v
+ LinkArgs:          %v
++LinkArgsWithoutObjects: %v
+ ForbiddenFlags:    %v
+ IsVerbose:         %v
+ IsDependencyOnly:  %v
+@@ -91,6 +93,7 @@ func (pr *ParserResult) String() string {
+ 		pr.OutputFilename,
+ 		pr.CompileArgs,
+ 		pr.LinkArgs,
++		pr.LinkArgsWithoutObjects,
+ 		pr.ForbiddenFlags,
+ 		pr.IsVerbose,
+ 		pr.IsDependencyOnly,
+@@ -159,6 +162,7 @@ func (pr *ParserResult) SkipBitcodeGeneration() bool {
+ func Parse(argList []string) ParserResult {
+ 	var pr = ParserResult{}
+ 	pr.InputList = argList
++	pr.LinkArgsWithoutObjects = make([]string,0)
+ 
+ 	var argsExactMatches = map[string]flagInfo{
+ 
+@@ -517,6 +521,7 @@ func (pr *ParserResult) objectFileCallback(flag string, _ []string) {
+ func (pr *ParserResult) linkerGroupCallback(start string, count int, args []string) {
+ 	group := args[0:count]
+ 	pr.LinkArgs = append(pr.LinkArgs, group...)
++	//pr.LinkArgsWithoutObjects = append(pr.LinkArgsWithoutObjects, group...)
+ }
+ 
+ func (pr *ParserResult) preprocessOnlyCallback(_ string, _ []string) {
+@@ -555,6 +560,7 @@ func (pr *ParserResult) linkTimeOptimizationCallback(_ string, _ []string) {
+ 
+ func (pr *ParserResult) linkUnaryCallback(flag string, _ []string) {
+ 	pr.LinkArgs = append(pr.LinkArgs, flag)
++	pr.LinkArgsWithoutObjects = append(pr.LinkArgsWithoutObjects, flag)
+ }
+ 
+ func (pr *ParserResult) compileUnaryCallback(flag string, _ []string) {
+@@ -581,14 +587,17 @@ func (pr *ParserResult) compileBinaryCallback(flag string, args []string) {
+ 
+ func (pr *ParserResult) linkBinaryCallback(flag string, args []string) {
+ 	pr.LinkArgs = append(pr.LinkArgs, flag, args[0])
++	pr.LinkArgsWithoutObjects = append(pr.LinkArgsWithoutObjects, flag, args[0])
+ }
+ 
+ func (pr *ParserResult) compileLinkUnaryCallback(flag string, _ []string) {
+ 	pr.LinkArgs = append(pr.LinkArgs, flag)
++	pr.LinkArgsWithoutObjects = append(pr.LinkArgsWithoutObjects, flag)
+ 	pr.CompileArgs = append(pr.CompileArgs, flag)
+ }
+ 
+ func (pr *ParserResult) compileLinkBinaryCallback(flag string, args []string) {
+ 	pr.LinkArgs = append(pr.LinkArgs, flag, args[0])
++	pr.LinkArgsWithoutObjects = append(pr.LinkArgsWithoutObjects, flag, args[0])
+ 	pr.CompileArgs = append(pr.CompileArgs, flag, args[0])
+ }

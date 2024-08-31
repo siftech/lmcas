@@ -1,0 +1,98 @@
+## This test corresponds to the "simple" LMCAS debloating tutorial
+
+do "./defaults.pl" || die "Can't do './defaults.pl': $@";
+
+## -------------------------------- ## --------------------------------
+## These are vbles that change for each test
+
+#$numoptimi=2;
+#$games_per_optimi=2;
+#$games_folder = "/openshell/code/test/fw-game-configs/fw-smoke-test";	
+
+## -------------------------------- ## --------------------------------
+
+do "./lmcas.pl" || die "Can't do './lmcas.pl': $@";
+do "./zlib.pl" || die "Can't do './zlib.pl': $@";
+
+do "./common.pl" || die "Can't do './common.pl': $@";
+
+use PRT::LineComparo;
+
+$test = {
+    defaultIgnore => 0,
+    keywords => [ qw / neckminer tabacco tutorial / ],
+    cleanup => \&killer,
+    agents => [
+    	&printenv,
+    	&print_results_dir,
+	@start_lmcas_container,
+        @build_zlib,
+
+    echo("wget: starting configure and make"),
+    {
+        name         => "configure-and-make-wget",
+        command      => [ "timeout","3m","$ENV{'PRT_PATH'}/timestamp","docker","exec","lmcas","bash","-c",'tar xaf /usr/src/wget-1.21.3.tar.lz; cd wget-1.21.3; ./configure --without-ssl; make -j $(nproc) -l $(nproc)',
+                          ],
+        comparo      => undef,
+        complete_before_continuing =>1,
+    },
+    	echo("Debloating wget with user spec..."), 
+	{	# this one we just make sure it returns 1... the output of tabacco changes too much to check it
+          name         => "tabacco-wrong-spec",
+          command      => [ "timeout","2m","$ENV{'PRT_PATH'}/timestamp","docker","exec","lmcas","bash","-c", "cd wget; tabacco -o wget-debloated spec.json" ],
+	  comparo      => undef,
+	  complete_before_continuing => 1,
+	  exit_code    => 1
+    	},
+    	echo("Debloating wget with test spec..."), 
+	{	# this one we just make sure it returns zero... the output of tabacco changes too much to check it
+          name         => "tabacco-debloated",
+          command      => [ "timeout","2m","$ENV{'PRT_PATH'}/timestamp","docker","exec","lmcas","bash","-c", "cd wget; tabacco -o wget-debloated /specs/wget.json" ],
+	  comparo      => undef,
+	  complete_before_continuing =>1,
+    	},
+    	echo("Testing debloated program"), 
+	{ name         => "test-http-debloated",
+          command      => [ "docker","exec","lmcas","bash","-c","cd wget; ~/test_http.py &" ], 
+	  comparo      => undef,
+	  complete_before_continuing =>1},
+	{ name         => "wget-debloated",
+          command      => [ "docker","exec","lmcas","bash","-c","cd wget; ./wget-debloated" ], 
+	  exit_code    => 100},
+	{ name         => "wget-debloated-get",
+          command      => [ "docker","exec","lmcas","bash","-c","cd wget; ./wget-debloated --method=GET -O- http://localhost:8000/" ],
+	  comparo      => new PRT::LineComparo(key_fact_regexp => "Got a GET request; hello!")},
+	{ name         => "wget-debloated-get-N",
+          command      => [ "docker","exec","lmcas","bash","-c","cd wget; ./wget-debloated -N --method=GET -O- http://localhost:8000/" ],
+	  exit_code    => 100},
+	{ name         => "wget-debloated-url",
+          command      => [ "docker","exec","lmcas","bash","-c","cd wget; ./wget-debloated --method=GET -O- --no-check-certificate http://localhost:8000/" ], 
+	  comparo      => undef,
+	  exit_code    => 4},
+	{ name         => "test-http-kill",
+          command      => [ "docker","exec","lmcas","bash","-c", "pkill python3" ], 
+	  comparo      => undef,
+	  complete_before_continuing =>1},
+    	echo("Debloating with -N to test original functionality..."), 
+	{	# this one we just make sure it returns zero... the output of tabacco changes too much to check it
+          name         => "tabacco-nondebloated",
+          command      => [ "timeout","2m","$ENV{'PRT_PATH'}/timestamp","docker","exec","lmcas","bash","-c", "cd wget; tabacco -o nondebloated -N spec.json" ],
+	  comparo      => undef,
+          complete_before_continuing =>1,
+    	},
+    	echo("Testing nondebloated program"), 
+	{ name         => "test-http-nondebloated",
+          command      => [ "docker","exec","lmcas","bash","-c","cd wget; ~/test_http.py &" ], 
+	  comparo      => undef,
+	  complete_before_continuing =>1},
+	{ name         => "nondebloated",
+          command      => [ "docker","exec","lmcas","bash","-c","cd wget; ./nondebloated" ], 
+	  exit_code => 1},	# expected error!
+	{ name         => "nondebloated-get",
+          command      => [ "docker","exec","lmcas","bash","-c","cd wget; ./nondebloated --method=GET -O- http://localhost:8000/" ],
+	  comparo      => new PRT::LineComparo(key_fact_regexp => "Got a GET request; hello!")},
+        echo("Test complete!")
+	],
+};
+
+$test;

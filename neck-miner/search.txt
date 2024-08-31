@@ -1,0 +1,152 @@
+Paired with example.txt.
+
+Reachability to RR0
+-------------------
+
+(main:
+  mbb0: M_0 { },
+  (bar: 
+    bbb0: B_0 { }
+    (foo:
+      fbb0: F_0 { }
+      fbb2: F_1 { }
+      fbb3: F_2 { }
+      fbb5: F_3 { }
+      (cp1:
+        cp1bb0: C1_0 { },
+        cp1bb1: C1_1 { },
+RR0     cp1bb3: C1_2 { },
+
+Compute path attributes of cp1bb3.
+
+TODO: Make a function that computes this for the Full Path.
+
+cp1bb3 =  C1_2 + summed history of cp1 + 
+          F_3 + summed history of foo +
+          B_0 + summed history of bar + 
+          M_0 + summed history of main;
+
+
+cp1bb3 =  C1_2:{succeedsLoops: 1, maxGetoptsPassed: 1} +
+            summed history of cp1 + 
+          F_3:{succeedsLoops: 1, maxGetopsPassed: 1} +
+            summed history of foo +
+          B_0:{succeedsLoops: 0, maxGetoptsPassed: 0} +
+            summed history of bar + 
+          M_0:{succeedsLoops: 0, maxGetoptsPassed: 0} +
+            summed history of main;
+
+Result of path computation back to main().
+RR0: cp1bb3 = { succeedsLoops: 2, maxGetoptsPassed: 2 }
+        
+
+Back out of cp1bb3 to keep searching.
+-------------------------------------
+
+Step 1:
+
+First, we start with the path to RR0.
+
+(main:
+  mbb0: M_0 { }
+  (bar: 
+    bbb0: B_0 { }
+    (foo:
+      fbb0: F_0 { }
+      fbb2: F_1 { }
+      fbb3: F_2 { }
+      fbb5: F_3 { }
+      (cp1:
+        cp1bb0: C1_0 { }
+        cp1bb1: C1_1 { }
+        cp1bb3: C1_2 { }))))
+
+Step 2:
+We come to the end of cp1(), which only had one exit path, and must backtrack.
+The exit path is:
+[   
+  (cp1:
+    cp1bb0: C1_0 { }
+    cp1bb1: C1_1 { }
+    cp1bb3: C1_2 { })
+]
+
+First, compute, for each exit path, its contribution over just that function's
+history: Use the "Exit Path Summary Function" in this loop.
+
+cp1_contrib_0 = 
+  C1_2:{succeedsLoops: 1, maxGetoptsPassed: 1} + 
+  summed history of cp1;
+
+Applying that function over the list produces a list of concrete contributions:
+[ cp1_contrib_0 ]
+
+Second, we pass this list to the "Exit Summary Merge Function":
+This combines in some manner all the hashtables to produce a single summary
+of the information.
+
+final_contribution = exit_summary_merge_func( [ cp1_contrib_0 ] )
+
+Third, the final_contribution is the completed and concrete contribution for
+_THAT SPECIFIC CALL TO foo()_ in the fbb5 basic block.
+
+Fourth, It must be summed into the currently accumulating contributions for
+the fbb5 basic block. Use the "Basic Block Summarize a Summary Function".
+
+(main:
+  mbb0: M_0 { }
+  (bar: 
+    bbb0: B_0 { }
+    (foo:
+      fbb0: F_0 { }
+      fbb2: F_1 { }
+      fbb3: F_2 { }
+      fbb5: F_3 {succeedsLoops: 1, maxGetoptsPassed: 1},
+
+
+Step 3: (A repeat of step 2 from bar's view of foo's exit)
+We exit foo and have to rectify multiple paths stored in foo about how the
+function exited.
+
+First, we perform summaries of each exit path:
+Exit Path Summary Function (which does actual sums for these attributes):
+
+Apply it to each exit_path
+[  (foo:
+     fbb0: F_0 { }
+     fbb2: F_1 { }
+     fbb4: F_2 { }),
+   (foo:
+     fbb0: F_0 { }
+     fbb2: F_1 { }
+     fbb3: F_2 { }
+     fbb5: F_3 {succeedsLoops: 1, maxGetoptsPassed: 1})
+]
+
+
+and produce an exit_path_contribution_ht_list:
+
+[ {succeedsLoops: 1, maxGetoptsPassed: 1}, 
+  {succeedsLoops: 2, maxGetoptsPassed: 2}
+]
+
+Second, we pass this list to "Exit Summary Merge Function" and produce the
+final_contribution_ht: NOTE: This was a max() operation, not a sum.
+
+{succeedsLoops: 2, maxGetoptsPassed: 2}
+
+Third, Use "Basic Block Summarize a Summary Function" to take this
+final_contribution_ht and absorb it into the accumulating basic basic block
+summary.
+
+The inital bbb0 basic block summary is { } so we merge the contribution
+into it (via summation) and get { succeedsLoops: 1, maxGetoptsPassed: 1}.
+
+(main:
+  mbb0: M_0 { }
+  (bar: 
+    bbb0: B_0 { succeedsLoops: 2, maxGetoptsPassed: 2}))
+
+
+Reachability to RR1
+-------------------

@@ -1,0 +1,11 @@
+1451a1452,1454
+> __attribute__((noinline))
+> void _lmcas_neck() {}
+> 
+1935c1938
+< 
+---
+> 	_lmcas_neck();
+2224a2228,2229
+> 
+> 	//_lmcas_neck();

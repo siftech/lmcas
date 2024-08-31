@@ -1,0 +1,5 @@
+[11819] Apr 21 16:26:23 Forced command set to 'uptime'
+[11819] Apr 21 16:26:23 Not backgrounding
+[11826] Apr 21 16:26:23 Child connection from 127.0.0.1:49304
+[11826] Apr 21 16:26:23 Pubkey auth succeeded for 'root' with key sha1!! d4:04:1f:f8:08:bc:03:c4:79:7b:38:bb:f2:e9:ff:f6:bb:39:bf:d9 from 127.0.0.1:49304
+[11826] Apr 21 16:26:23 Exit (root) from <127.0.0.1:49304>: Disconnect received

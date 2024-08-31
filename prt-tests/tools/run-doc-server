@@ -1,0 +1,27 @@
+#!/bin/bash
+# Define DEBUG env var on way in if you want debugging output, ala DEBUG=1 start-image foo
+
+#if [ "$#" == "0" ]; then
+#	echo "Usage: $0 imagename [other-docker-run-args]"
+#	exit 1
+#fi
+
+PROGNAME=$(basename "$0")
+warn()  { echo "$PROGNAME: ${@}" 1>&2; }
+die()   { warn "${@}"; exit 1; }
+dbug()   { test -z $DEBUG || warn "${@}"; }
+
+# example usage:
+   #dbug This only prints if DEBUG is defined
+   #test -e foo || die file foo must exist
+   #test -z $FOO && die Environment variable FOO must be defined
+
+# bash-ism to get location of script.  Must use /bin/pwd to get absolute path.
+thisdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd -P "$( dirname "$SOURCE" )" && /bin/pwd )"
+dbug thisdir is $thisdir
+
+export DOC_PORT=${DOC_PORT:-12345}
+dbug DOC_PORT is $DOC_PORT
+
+$thisdir/start-image lmcas -d
+docker exec -d lmcas serve-docs

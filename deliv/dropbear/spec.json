@@ -1,0 +1,40 @@
+{
+  "binary": "/root/dropbear-2020.81/dropbear",
+  "configs": [
+    {
+      "args": [
+        "dropbear",
+        "-w",
+        "-j",
+        "-E",
+        "-F",
+        "-R",
+        "-I",
+        "60"
+      ],
+      "env": {
+        "CWD": "/",
+        "PATH": "/bin"
+      },
+      "cwd": "/"
+    },
+    {
+      "args": [
+        "dropbear",
+        "-j",
+        "-E",
+        "-F",
+        "-R",
+        "-I",
+        "60",
+        "-c",
+        "uptime"
+      ],
+      "env": {
+        "CWD": "/",
+        "PATH": "/bin"
+      },
+      "cwd": "/"
+    }
+  ]
+}

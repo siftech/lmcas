@@ -1,0 +1,11 @@
+{
+  "binary": "/code/instrumentation-runtime/example/main",
+  "args": [
+    "main"
+  ],
+  "env": {
+    "CWD": "/",
+    "PATH": "/bin"
+  },
+  "cwd": "/"
+}

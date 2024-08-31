@@ -1,0 +1,127 @@
+#!/usr/bin/env python3
+
+from argparse import ArgumentParser
+from pathlib import Path
+import re
+from shutil import copytree
+from subprocess import (
+    check_call,
+    CalledProcessError,
+    Popen,
+    DEVNULL,
+    PIPE,
+    STDOUT,
+)
+from sys import stdout
+
+
+def main():
+    """
+    Builds all binaries associated with the LMCAS test suite & runs linter & unit tests
+    """
+    parser = ArgumentParser(description="Debloat binaries in the LMCAS test suite.")
+    parser.add_argument(
+        "-j",
+        "--jobs",
+        action="store",
+        default="auto",
+        help="The number of parallel jobs to run, or auto for the number of hardware threads",
+    )
+    parser.add_argument(
+        "--no-target",
+        action="store",
+        default="",
+        help="don't run tests on the specified target; must be a comma-separated list of targets without spaces",
+    )
+    parser.add_argument(
+        "--no-test",
+        action="store",
+        default="",
+        help="don't run the specified tests; must be a comma-separated list of tests without spaces",
+    )
+    parser.add_argument(
+        "--result-dir",
+        action="store",
+        required=True,
+        help="specifies directory where debloated results should be written to",
+    )
+    args = parser.parse_args()
+
+    # Make the results directory.
+    results_dir = Path(args.result_dir)
+    print(f"Logging to {results_dir}")
+
+    last_run_path = Path("test/results/last-run")
+    last_run_path.unlink(missing_ok=True)
+    print(f"Symlinking {last_run_path} to {results_dir.name}")
+    last_run_path.symlink_to(results_dir.name)
+
+    # Instantiate a derivation corresponding to the targets we want to debloat
+    # and the tests we want to run
+    instantiate_flags = ["--add-root", results_dir / "lmcas-tests.drv"]
+
+    instantiate_flags += [
+        "--argstr",
+        "noTest",
+        args.no_test,
+    ]
+    instantiate_flags += [
+        "--argstr",
+        "noTarget",
+        args.no_target,
+    ]
+
+    check_call(
+        ["nix-instantiate"] + instantiate_flags + ["test/build-tests.nix"],
+        stdout=DEVNULL,
+    )
+
+    test_proc = Popen(
+        [
+            "nix-store",
+            "-j",
+            args.jobs,
+            "--realise",
+            "--add-root",
+            results_dir / "target-binaries",
+            "--keep-failed",
+            results_dir / "lmcas-tests.drv",
+        ],
+        stdin=DEVNULL,
+        stdout=PIPE,
+        stderr=STDOUT,
+        encoding="utf-8",
+    )
+
+    if not test_proc.stdout == None:
+        for line in test_proc.stdout:
+            stdout.write(line)
+
+            match = re.match("note: keeping build directory '([^']*)'", line)
+            if match is not None:
+                build_dir = Path(match[1])
+                (results_dir / "build").mkdir(exist_ok=True, parents=True)
+                copytree(build_dir, results_dir / "build" / build_dir.name)
+                print(f"note: copying build directory to '{results_dir / 'build'}'")
+
+    # Check the result.
+    test_proc.wait()
+    if test_proc.returncode == 0:
+        status = "success"
+    else:
+        status = "failure"
+    print(f"{status}; logs in {results_dir}/log")
+
+    if test_proc.returncode == 0:
+        # Copy the full results out of the Nix store, if we succeeded.
+        copytree(results_dir / "target-binaries", results_dir / "target-binaries.copy")
+        (results_dir / "target-binaries").unlink()
+        (results_dir / "target-binaries.copy").rename(results_dir / "target-binaries")
+    else:
+        (results_dir / "target-binaries").symlink_to(results_dir / "build/out")
+        # If we failed, exit with the same result nix-store --realise gave us.
+        raise CalledProcessError(test_proc.returncode, test_proc.args)
+
+
+if __name__ == "__main__":
+    main()

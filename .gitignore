@@ -1,0 +1,16 @@
+.ccls-cache/
+.direnv/
+.gdb_history
+
+__pycache__/
+result
+result-doc
+result-debug
+/result-*
+target/
+/build
+/*.bc
+tmp
+doc.tar.gz
+
+.cache

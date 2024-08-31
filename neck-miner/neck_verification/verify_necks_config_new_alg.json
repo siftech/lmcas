@@ -1,0 +1,83 @@
+{
+  "module-defaults": {
+    "taint-config": "config/cmd-tool-config.json",
+    "function-local-points-to-info-wo-globals": true,
+    "use-simplified-dfa": true,
+    "timeout-duration": "10m",
+    "timeout-kill-after": "5m"
+  },
+  "modules": [
+    {
+      "path": "external/slash-dataset/curl.ll"
+    },
+    {
+      "path": "external/slash-dataset/date.ll"
+    },
+    {
+      "path": "external/slash-dataset/diff.ll"
+    },
+    {
+      "path": "external/slash-dataset/dnsproxy.ll"
+    },
+    {
+      "path": "external/slash-dataset/du.ll"
+    },
+    {
+      "path": "external/slash-dataset/echo.ll"
+    },
+    {
+      "path": "external/slash-dataset/gzip.ll"
+    },
+    {
+      "path": "external/slash-dataset/httpd.ll"
+    },
+    {
+      "path": "external/slash-dataset/id.ll"
+    },
+    {
+      "path": "external/slash-dataset/kill.ll"
+    },
+    {
+      "path": "external/slash-dataset/knock.ll"
+    },
+    {
+      "path": "external/slash-dataset/knockd.ll"
+    },
+    {
+      "path": "external/slash-dataset/lighttpd.ll"
+    },
+    {
+      "path": "external/slash-dataset/mini_httpd.ll"
+    },
+    {
+      "path": "external/slash-dataset/named.ll"
+    },
+    {
+      "path": "external/slash-dataset/nginx.ll"
+    },
+    {
+      "path": "external/slash-dataset/objdump.ll"
+    },
+    {
+      "path": "external/slash-dataset/psql.ll"
+    },
+    {
+      "path": "external/slash-dataset/readelf.ll"
+    },
+    {
+      "path": "external/slash-dataset/sort.ll"
+    },
+    {
+      "path": "external/slash-dataset/tcpdump.ll"
+    },
+    {
+      "path": "external/slash-dataset/uniq.ll"
+    },
+    {
+      "path": "external/slash-dataset/wc.ll"
+    },
+    {
+      "path": "external/slash-dataset/wget.ll"
+    }
+  ]
+}

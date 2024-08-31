@@ -1,0 +1,53 @@
+#!/bin/sh
+
+cleared=
+shared=
+userlinkdir=
+userlink=
+for x ; do
+	test "$cleared" || set -- ; cleared=1
+
+	case "$x" in
+	-L-user-start)
+		userlinkdir=1
+		;;
+	-L-user-end)
+		userlinkdir=
+		;;
+	-L*)
+		test "$userlinkdir" && set -- "$@" "$x"
+		;;
+	-l-user-start)
+		userlink=1
+		;;
+	-l-user-end)
+		userlink=
+		;;
+	crtbegin*.o|crtend*.o)
+		set -- "$@" $("@WRAPPED_CC@" -print-file-name=$x)
+		;;
+	-lgcc|-lgcc_eh)
+		file=lib${x#-l}.a
+		set -- "$@" $("@WRAPPED_CC@" -print-file-name=$file)
+		;;
+	-l*)
+		test "$userlink" && set -- "$@" "$x"
+		;;
+	-shared)
+		shared=1
+		set -- "$@" -shared
+		;;
+	-sysroot=*|--sysroot=*)
+		;;
+	*)
+		set -- "$@" "$x"
+		;;
+	esac
+done
+
+exec $("@WRAPPED_CC@" -print-prog-name=ld) \
+	-nostdlib \
+	"$@" \
+	-lc \
+	"@LIBUNWIND@/lib/libunwind.a" \
+	-dynamic-linker "@MUSL@/lib/ld-musl-x86_64.so.1"

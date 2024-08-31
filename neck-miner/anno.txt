@@ -1,0 +1,39 @@
+Pass Annotations on for a basic block node.
+
+Definitions:
+
+T - Assert a tainted block property
+t - Refute a tainted block property
+B - Assert a boundary candidate property
+b - Refute a boundary candidate property
+N - Assert a final neck candidate property
+n - Refute a final neck candidate property
+
+P - A Pass number
+I - An Iteration of some loop (often in a pass)
+
+Structure:
+
+P:IB - In pass P, iteration I, we asserted the boundary candidate status.
+PB - If there is no concept of an iteration: In pass P, assert B.Cand. status.
+
+P:Ib - In pass P, iteration I, we refuted the boundary candidate status.
+Pb - If there is no concept of an iteration: In pass P, refute B.Cand. status.
+
+Annotation history:
+
+An unordered_map of basic blocks is kept, keyed by BasicBlock* whose value is
+a std::deque<std::string>. Every time a node is asserted or refuted, another
+annotation string is enqueued.
+
+Examples of annotation strings enqueues to the annotation history.
+
+"3:4B" - In pass 3, iteration 4, assert boundary candidate status.
+"0B" - In pass 0, assert boundary candidate status.
+
+"8:2b" - In pass 8, iteration 2, refute boundary candidate status.
+"9b" - In pass 9, refute boundary candidate status.
+
+When a basic block is visualized in graphviz, the deque is printed out with it
+from earliest to latest and from top to bottom so we can see the history of
+how the boundary candidates evolved over the algorithm.

@@ -1,0 +1,11 @@
+{
+  "args": [
+    null,
+    "-i",
+    "lo",
+    "-c",
+    "5"
+  ],
+  "more_args": false,
+  "config_files": []
+}

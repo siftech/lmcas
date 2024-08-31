@@ -1,0 +1,20 @@
+--- wget-1.21.2/src/main.c	2021-09-07 18:56:08.000000000 +0000
++++ wget-1.21.2/src/main.c	2022-06-09 22:21:19.756121984 +0000
+@@ -27,6 +27,8 @@
+ shall include the source code for the parts of OpenSSL used as well
+ as that of the covered work.  */
+ 
++__attribute__((noinline)) void _lmcas_neck() {}
++
+ #include "wget.h"
+ 
+ #include <stdio.h>
+@@ -1579,6 +1582,8 @@
+ 
+   nurls = argc - optind;
+ 
++  _lmcas_neck();
++
+   /* Initialize logging ASAP.  */
+   log_init (opt.lfilename, append_to_log);
+ 

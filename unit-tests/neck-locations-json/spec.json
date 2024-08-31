@@ -1,0 +1,19 @@
+{
+  "binary": "input-binary",
+  "configs": [
+    {
+      "args": [
+        "main",
+        "-h"
+      ],
+      "env": {},
+      "cwd": "/"
+    }
+  ],
+  "extra_neck_locations": [
+    {
+      "basic_block_annotation_id": "1073741832",
+      "insn_index": 0
+    }
+  ]
+}

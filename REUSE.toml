@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: 2022-2024 Smart Information Flow Technologies
+#
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+
+version = 1
+
+[[annotations]]
+path = "doc/**/*.md"
+SPDX-FileCopyrightText = "2022-2024 Smart Information Flow Technologies"
+SPDX-License-Identifier = "Apache-2.0 OR MIT"
+
+[[annotations]]
+path = "test/**/*.json"
+SPDX-FileCopyrightText = "2022-2024 Smart Information Flow Technologies"
+SPDX-License-Identifier = "Apache-2.0 OR MIT"
+
+[[annotations]]
+path = "unit-tests/*.json"
+SPDX-FileCopyrightText = "2022-2024 Smart Information Flow Technologies"
+SPDX-License-Identifier = "Apache-2.0 OR MIT"

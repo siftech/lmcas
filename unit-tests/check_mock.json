@@ -1,0 +1,32 @@
+{
+  "binary": "check_mock",
+  "configs": [
+    {
+      "args": [
+        "check_mock"
+      ],
+      "env": {
+        "CWD": "/",
+        "PATH": "/bin"
+      },
+      "cwd": "/",
+      "syscall_mocks": {
+        "sys_getuid": {
+          "uid": 1000
+        },
+        "sys_geteuid": {
+          "euid": 1001
+        },
+        "sys_getgid": {
+          "gid": 1002
+        },
+        "sys_getpid": {
+          "pid": 1003
+        },
+        "sys_getppid": {
+          "ppid": 1004
+        }
+      }
+    }
+  ]
+}

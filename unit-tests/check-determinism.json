@@ -1,0 +1,15 @@
+{
+  "binary": "check-determinism",
+  "configs": [
+    {
+      "args": [
+        "check-determinism"
+      ],
+      "env": {
+        "CWD": "/",
+        "PATH": "/bin"
+      },
+      "cwd": "/"
+    }
+  ]
+}

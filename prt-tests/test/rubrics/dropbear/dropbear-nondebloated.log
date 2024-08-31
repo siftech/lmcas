@@ -1,0 +1,4 @@
+[11908] Apr 21 17:16:46 Not backgrounding
+[11915] Apr 21 17:16:46 Child connection from 127.0.0.1:46858
+[11915] Apr 21 17:16:46 Pubkey auth succeeded for 'root' with key sha1!! d4:04:1f:f8:08:bc:03:c4:79:7b:38:bb:f2:e9:ff:f6:bb:39:bf:d9 from 127.0.0.1:46858
+[11915] Apr 21 17:16:46 Exit (root) from <127.0.0.1:46858>: Disconnect received

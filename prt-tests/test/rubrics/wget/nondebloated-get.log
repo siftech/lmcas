@@ -1,0 +1,13 @@
+--2023-04-14 13:16:16--  http://localhost:8000/
+Resolving localhost... ::1, 127.0.0.1
+Connecting to localhost|::1|:8000... failed: Connection refused.
+Connecting to localhost|127.0.0.1|:8000... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: unspecified [text/plain]
+Saving to: ‘STDOUT’
+Got a GET request; hello!
+
+     0K                                                         491K=0s
+
+2023-04-14 13:16:16 (491 KB/s) - written to stdout [26]
+

@@ -1,0 +1,8 @@
+[
+  {
+    "basic_block_annotation_id": "1073741899",
+    "basic_block_name": "%1",
+    "function": "setup_sock",
+    "insn_index": 9
+  }
+]

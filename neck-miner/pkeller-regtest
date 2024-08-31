@@ -1,0 +1,54 @@
+#! /usr/bin/env bash
+
+# This is a script to quickly run the neck-miner on input
+# files that have been annotated with the lmcas basic block annotation
+# pass. This is much more for quick manual verification of things than
+# something that is supposed ot be used. When the full regression
+# testing pipeline for neck miner is complete this can almost certainly
+# be deleted.
+
+DATADIR="./external/slash-dataset"
+
+IR_FILES="curl-annoid.ll \
+  date-annoid.ll \
+  diff-annoid.ll \
+  dnsproxy-annoid.ll \
+  du-annoid.ll \
+  echo-annoid.ll \
+  gzip-annoid.ll \
+  httpd-annoid.ll \
+  id-annoid.bc \
+  kill-annoid.ll \
+  knock-annoid.ll \
+  knockd-annoid.ll \
+  lighttpd-annoid.ll \
+  mini_httpd-annoid.ll \
+  named-annoid.ll \
+  nginx-annoid.ll \
+  objdump-annoid.ll \
+  psql-annoid.ll \
+  readelf-annoid.ll \
+  sort-annoid.ll \
+  tcpdump-annoid.ll \
+  wc-annoid.ll \
+  wget-annoid.ll"
+
+# check to make sure all my IR files are present
+echo "Checking that all IR files are present..."
+for i in ${IR_FILES}
+do
+  irfile="${DATADIR}/$i"
+  if [ ! -f "$irfile" ]; then
+    echo "File $irfile not found. Aborting."
+    exit 1
+  fi
+done
+
+echo "Running tests to find necks..."
+for i in ${IR_FILES}
+do
+  irfile="${DATADIR}/$i"
+  echo "Processing $i:"
+  ./build/tools/neck-miner/neck-miner -m $irfile -c ./config/cmd-tool-config.json --function-local-points-to-info-wo-globals --use-simplified-dfa
+  echo
+done

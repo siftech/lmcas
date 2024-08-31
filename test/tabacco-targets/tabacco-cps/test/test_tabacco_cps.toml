@@ -1,0 +1,104 @@
+[cp1]
+
+[cp1.tests.hello]
+kind = "simple-run"
+args = ["-h"]
+expected_stdout = "Hello, world!\n"
+
+[cp1.tests.ls]
+kind = "simple-run"
+args = ["-h", "-l"]
+fixtures = ["ls_dir"]
+expected_stdout = "bar\nfoo\n"
+should_pass_debloated = false
+
+[cp2]
+
+[cp2.tests.hello]
+kind = "simple-run"
+args = ["-h"]
+expected_stdout = "Hello, world!\n"
+
+[cp2.tests.hello2]
+kind = "simple-run"
+args = ["-h", "1", "2", "3", "4"]
+expected_stdout = "Hello, world!\n1\n2\n3\n4\n"
+
+[cp2.tests.ls]
+kind = "simple-run"
+args = ["-h", "-l"]
+fixtures = ["ls_dir"]
+expected_stdout = "bar\nfoo\n"
+should_pass_debloated = false
+
+[cp3]
+
+[cp3.tests.noconfig]
+kind = "simple-run"
+args = ["-v"]
+expected_stdout = "Entering main.\nfoo = 0\nbar = 0\n"
+is_stderr_regex = true
+
+[cp4]
+
+[cp4.tests.todo]
+kind = "simple-run"
+args = []
+expected_stdout = "Tick #1, last caught signal: 0\n"
+expected_stderr = "TaBaCCo: TODO: Handle syscall SyscallRtSigprocmask { return_code: 0, how: 1, sigsetsize: 8, oset: [], nset: [12884901888] }\nTaBaCCo: TODO: Handle syscall SyscallRtSigaction { return_code: 0, sig: 10, act: [], oldact: [], sigsetsize: 8}\nTaBaCCo: TODO: Handle syscall SyscallRtSigaction { return_code: 0, sig: 12, act: [], oldact: [], sigsetsize: 8}\n"
+broken = true
+
+[cp5]
+
+[cp5.tests.simple]
+kind = "simple-run"
+args = ["-A", "0", "-B", "one", "-C", "two", "-D", "3", "-D", "4", "-D", "5", "-E", "8", "-E", "7", "-E", "6", "-F", "9", "-G", "10", "-H", "11", "-I", "12", "-J", "thirteen", "-K", "fourteen", "-L", "fifteen", "-M", "sixteen", "-N", "seventeen", "-O", "eighteen", "-P", "nineteen", "-Q", "twenty", "-R", "21", "-R", "22", "-R", "23", "-S", "24", "-S", "25", "-S", "26", "-T", "27", "-T", "28", "-T", "29", "-U", "30", "-U", "31", "-U", "32", "-V", "35", "-V", "34", "-V", "33", "-W", "38", "-W", "37", "-W", "36", "-X", "41", "-X", "40", "-X", "39", "-Y", "44", "-Y", "43", "-Y", "42", "-Z", "5", "-a", "2", "-b", "6", "-c", "1", "-d", "7", "-e", "0", "-f", "4", "-g", "3", "-h", "45", "-i", "forty six", "-j", "forty seven", "-k", "46", "-k", "47", "-k", "48", "-l", "49", "-l", "50", "-l", "51", "-m", "52", "-m", "53", "-m", "54", "-n", "57", "-n", "56", "-n", "55", "-o", "60", "-o", "59", "-o", "58"
+]
+expected_stdout = "A \\(global_int\\): 0\\nB \\(global_argv_str\\): 0x[0-9a-f]+, one\\nC \\(global_heap_str\\): 0x[0-9a-f]+, two\\nD \\(global_heap_int_vector\\): <3> 3 4 5\\nE \\(global_heap_int_list\\): 6 7 8\\nF \\(global_array_of_structs\\[0\\].int_\\): 9\\nG \\(global_array_of_structs\\[1\\].int_\\): 10\\nH \\(stack_array_of_structs\\[0\\].int_\\): 11\\nI \\(stack_array_of_structs\\[1\\].int_\\): 12\\nJ \\(global_array_of_structs\\[0\\].argv_str\\): 0x[0-9a-f]+ thirteen\\nK \\(global_array_of_structs\\[1\\].argv_str\\): 0x[0-9a-f]+ fourteen\\nL \\(stack_array_of_structs\\[0\\].argv_str\\): 0x[0-9a-f]+ fifteen\\nM \\(stack_array_of_structs\\[1\\].argv_str\\): 0x[0-9a-f]+ sixteen\\nN \\(global_array_of_structs\\[0\\].heap_str\\): 0x[0-9a-f]+ seventeen\\nO \\(global_array_of_structs\\[1\\].heap_str\\): 0x[0-9a-f]+ eighteen\\nP \\(stack_array_of_structs\\[0\\].heap_str\\): 0x[0-9a-f]+ nineteen\\nQ \\(stack_array_of_structs\\[1\\].heap_str\\): 0x[0-9a-f]+ twenty\\nR \\(global_array_of_structs\\[0\\].heap_int_vector\\): <3> 21 22 23\\nS \\(global_array_of_structs\\[1\\].heap_int_vector\\): <3> 24 25 26\\nT \\(stack_array_of_structs\\[0\\].heap_int_vector\\): <3> 27 28 29\\nU \\(stack_array_of_structs\\[1\\].heap_int_vector\\): <3> 30 31 32\\nV \\(global_array_of_structs\\[0\\].heap_int_list\\): 33 34 35\\nW \\(global_array_of_structs\\[1\\].heap_int_list\\): 36 37 38\\nX \\(stack_array_of_structs\\[0\\].heap_int_list\\): 39 40 41\\nY \\(stack_array_of_structs\\[1\\].heap_int_list\\): 42 43 44\\nZ \\(global_array_of_structs\\[0\\].bitfield_1\\): 5\\na \\(global_array_of_structs\\[1\\].bitfield_1\\): 2\\nb \\(stack_array_of_structs\\[0\\].bitfield_1\\): 6\\nc \\(stack_array_of_structs\\[1\\].bitfield_1\\): 1\\nd \\(global_array_of_structs\\[0\\].bitfield_2\\): 7\\ne \\(global_array_of_structs\\[1\\].bitfield_2\\): 0\\nf \\(stack_array_of_structs\\[0\\].bitfield_2\\): 4\\ng \\(stack_array_of_structs\\[1\\].bitfield_2\\): 3\\nh \\(stack_int\\): 45\\ni \\(stack_argv_str\\): 0x[0-9a-f]+, forty six\\nj \\(stack_heap_str\\): 0x[0-9a-f]+, forty seven\\nk \\(stack_alloca_int_vector\\): <3> 46 47 48\\nl \\(stack_flexible_int_vector\\): <3> 49 50 51\\nm \\(stack_heap_int_vector\\): <3> 52 53 54\\nn \\(stack_alloca_int_list\\): 55 56 57\\no \\(stack_heap_int_list\\): 58 59 60\\n"
+is_stdout_regex = true
+
+[cp6]
+
+[cp6.tests.hello]
+kind = "simple-run"
+args = ["-h"]
+expected_stdout = "Hello, world!\n"
+
+[cp6.tests.ls]
+kind = "simple-run"
+args = ["-h", "-l"]
+fixtures = ["ls_dir"]
+expected_stdout = "bar\nfoo\n"
+should_pass_debloated = false
+
+[cp8]
+
+[cp9]
+
+[cp_sighup_before_neck]
+
+[cp_sighup_after_neck]
+
+[cp_umask]
+
+[cp_umask.tests.read]
+kind = "simple-run"
+args = ["-r"]
+expected_stdout = "Old mask is: 18\nFile Permissions: \t-r--------\n\n"
+
+[cp_umask.tests.write]
+kind = "simple-run"
+args = ["-r", "-w"]
+expected_stdout = "Old mask is: 18\nFile Permissions: \t-r--------\n\n"
+
+[cp_fcntl_getfd]
+
+[cp_fcntl_getfd.tests.one]
+kind = "simple-run"
+args = ["-o"]
+expected_stdout = "File opened.\nFile status flags retrieved.\nOption 1 is selected and return of fcntl is: 1"
+
+[cp_fcntl_getfd.tests.onetwo]
+kind = "simple-run"
+args = ["-o", "-t"]
+expected_stdout = "File opened.\nFile status flags retrieved.\nOption 1 is selected and return of fcntl is: 1"

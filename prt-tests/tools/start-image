@@ -1,0 +1,105 @@
+#!/bin/bash
+# Starts image (first arg) (and attaches with -i, or detaches with -d) to the container.
+# Define DEBUG env var on way in if you want debugging output, ala DEBUG=1 start-image foo
+
+if [ "$#" == "0" ]; then
+	echo "Usage: $0 imagename [other-docker-run-args]"
+	exit 1
+fi
+
+PROGNAME=$(basename "$0")
+warn()  { echo "$PROGNAME: ${@}" 1>&2; }
+die()   { warn "${@}"; exit 1; }
+dbug()   { test -z $DEBUG || warn "${@}"; }
+
+# example usage:
+   #dbug This only prints if DEBUG is defined
+   #test -e foo || die file foo must exist
+   #test -z $FOO && die Environment variable FOO must be defined
+
+# bash-ism to get location of script.  Must use /bin/pwd to get absolute path.
+thisdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd -P "$( dirname "$SOURCE" )" && /bin/pwd )"
+dbug thisdir is $thisdir
+
+IMAGE=$1
+dbug image arg is $IMAGE
+shift	# drop the first arg
+
+test -z "$USER" && USER="${HOME##*/}"
+dbug USER is $USER
+
+#if [ -n "${DOCKER_HOST}" ]; then	# we're in docker rootless, disable realuser
+#    export HOST_USERNAME=root
+#elif [[ ( -f "/home/${USER}/bin/docker" ) && ( ! -z "$IN_DOCKER") ]]; then
+#    export HOST_USERNAME=$USER
+#else
+#    export HOST_USERNAME=$USER
+#fi
+#dbug HOST_USERNAME is $HOST_USERNAME 
+
+NAME=$IMAGE	# default
+
+# stash the original args except image, for later use
+allargs=$@
+dbug allargs is $allargs
+
+# scan args to see if someone used --name to change containername away from default
+while [[ $# -gt 0 ]]
+do
+    case "$1" in
+        --name)
+            NAME="$2"
+            shift
+            shift
+            ;;
+	*)
+	    shift;
+	    ;;
+    esac
+done
+
+dbug final NAME to check is $NAME
+
+if $thisdir/check-for-running-container $IMAGE $NAME; then exit 0; fi
+
+# Set default docker tag
+export DOCKER_TAG=${DOCKER_TAG:-"nightly"}
+dbug DOCKER_TAG is $DOCKER_TAG
+
+export DOC_PORT=${DOC_PORT:-12345}
+dbug DOC_PORT is $DOC_PORT
+
+dbug Starting $NAME
+
+# The /etc/localtime mount gets the timezone aligned inside the container.
+# [mpelican:20180328.1517CDT] Unfort, the /etc/localtime mount is busted on MacOS: https://github.com/docker/for-mac/issues/2396
+case $OSTYPE in
+ linux*)
+   TIMEZONE_MOUNT="-v /etc/localtime:/etc/localtime"
+   dbug on linux TIMEZONE_MOUNT is ${TIMEZONE_MOUNT}
+   ;;
+ darwin*)
+   TIMEZONE_MOUNT=""
+   dbug on mac TIMEZONE_MOUNT is ${TIMEZONE_MOUNT}
+   ;;
+ *)
+   TIMEZONE_MOUNT=""
+   warn WARNING: Not running in a recognized Linux or Mac OS, this may need to be ported!
+   ;;
+esac
+
+docker run -t \
+	-e DOCKER_IMAGENAME=$IMAGE\
+	-e DOCKER_CONTAINERNAME=$NAME\
+	-e IN_DOCKER=1\
+	-e DEBUG \
+	-e "DOCKER_HOSTNAME=`hostname -f`" \
+	-v /tmp:/tmp \
+	-v `/bin/pwd`:/here \
+        ${TIMEZONE_MOUNT} \
+	--name ${NAME} \
+       $allargs $IMAGE:${DOCKER_TAG} bash
+
+# if we set up bashrc that prints the 'container is up' then we can use this...otherwise...
+#$thisdir/wait-for-container $NAME
+$PRT_PATH/flaky 3 1 $thisdir/check-for-running-container $IMAGE $NAME >/dev/null

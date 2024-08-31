@@ -1,0 +1,35 @@
+{
+  "binary": "check_bind_to_zero_port_ipv6",
+  "configs": [
+    {
+      "args": [
+        "check_bind"
+      ],
+      "env": {
+        "CWD": "/",
+        "PATH": "/bin"
+      },
+      "cwd": "/",
+      "syscall_mocks": {
+        "sys_getuid": {
+          "uid": 1000
+        },
+        "sys_geteuid": {
+          "euid": 1000
+        },
+        "sys_bind": {
+          "allow": {
+            "af_inet": true,
+            "af_inet6": true
+          }
+        },
+        "sys_socket": {
+          "allow": {
+            "af_inet": false,
+            "af_inet6": true
+          }
+        }
+      }
+    }
+  ]
+}

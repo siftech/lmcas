@@ -1,0 +1,21 @@
+0. Build function set T set where each function has a tainted node in it.
+
+1. Build function set P which includes only all path members of simple paths
+   through the call graph (of functions only) from main() to each function in T.
+   P should be functions that are either main(), something in T, or something
+   on the path from main() to anything in T.
+
+2. The NeckSearch algorithm is basically:
+    Create a BFSQ for a function's BB graph and push it onto a stack.
+    Ask the BFSQ to search through the BB graph until it finds a choke
+    point.
+    If there is an instruction in the choke point that calls something from P,
+    then save the position of the current BFSQ, create a new BFSQ for that
+    new function push it onto the stack and start searching through the new
+    BFSQ. If we run out of paths, then we pop the stack and continue where
+    we left off in the previous BFSQ. If all BFSQs get popped, we're done.
+
+    I implemented the actual code to take a function which receives the
+    full path to a choke point. This causes the larger search algorithm to
+    act like an iterator, sort of like MAPHASH, etc.
+

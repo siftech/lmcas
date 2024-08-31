@@ -1,0 +1,8 @@
+*
+
+!docker/bashrc
+!docker/bootstrap/pkgs.nix
+!docker/entrypoint.sh
+!docker/nix.conf
+!flake.lock
+!flake.nix

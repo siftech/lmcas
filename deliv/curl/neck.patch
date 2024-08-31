@@ -1,0 +1,21 @@
+diff -ru curl-7.83.1/src/tool_operate.c curl-7.83.1/src/tool_operate.c
+--- curl-7.83.1/src/tool_operate.c	2022-05-10 06:28:28.000000000 +0000
++++ curl-7.83.1/src/tool_operate.c	2022-08-10 22:08:58.501145664 +0000
+@@ -103,6 +103,8 @@
+   "this situation and\nhow to fix it, please visit the web page mentioned " \
+   "above.\n"
+ 
++__attribute__((noinline)) void _lmcas_neck(void) {}
++
+ static CURLcode single_transfer(struct GlobalConfig *global,
+                                 struct OperationConfig *config,
+                                 CURLSH *share,
+@@ -2634,6 +2636,8 @@
+       }
+ #endif
+ 
++      _lmcas_neck();
++
+       /* Perform the main operations */
+       if(!result) {
+         size_t count = 0;

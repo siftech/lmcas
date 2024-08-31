@@ -1,0 +1,2 @@
+USAGE: dropbear -w -j -E -F -R -I 60 [ARGS...]
+       dropbear -j -E -F -R -I 60 -c uptime [ARGS...]

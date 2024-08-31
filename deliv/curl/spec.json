@@ -1,0 +1,24 @@
+{
+  "binary": "/root/curl-fake-install/bin/curl",
+  "args": [
+    "curl",
+    "-X",
+    "POST",
+    "-d",
+    "{\"title\": \"Curl POST\",\"body\": \"Curl POST example body\",\"userId\":1}",
+    "http://127.0.0.1:8000/example"
+  ],
+  "env": {
+    "CWD": "/",
+    "CURL_HOME": "/fake-curl-home",
+    "PATH": ""
+  },
+  "cwd": "/",
+  "syscall_mocks": {
+    "sys_open": {
+      "mapping": {
+        "/fake-curl-home/.curlrc": "curlrc"
+      }
+    }
+  }
+}

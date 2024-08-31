@@ -1,0 +1,58 @@
+#!/bin/sh
+
+# prevent clang from running the linker (and erroring) on no linker input.
+# if clang input includes a stage selection flag that does not include running
+# the linker, then we exclude other linker flags.
+sflags=
+eflags=
+nolink=
+for x ; do
+	case "$x" in
+		-l*) input=1 ;;
+		-E | -fsyntax-only | -S | -c) nolink=1 ;;
+		*) input= ;;
+	esac
+	if test "$input" ; then
+		sflags="-l-user-start"
+		eflags="-l-user-end"
+		break
+	fi
+done
+
+if test "$nolink" ; then
+	exec "@CC@" \
+		-B"@COMPILER_RT@/lib" \
+		-B"@OUT@/bin" \
+		-fPIC \
+		-Wno-unused-command-line-argument \
+		-nostdinc \
+		--sysroot "@MUSL@" \
+		-isystem "@MUSL_DEV@/include" \
+		-isystem "@CLANG_LIB@/lib/clang/12.0.1/include" \
+		-Xclang \
+		-disable-llvm-passes \
+		$sflags \
+		"$@" \
+		$eflags
+else
+	exec "@CC@" \
+		-B"@COMPILER_RT@/lib" \
+		-B"@OUT@/bin" \
+		-fPIC \
+		-Wno-unused-command-line-argument \
+		-fuse-ld=musl-gclang \
+		-nostdinc \
+		--sysroot "@MUSL@" \
+		-isystem "@MUSL_DEV@/include" \
+		-isystem "@CLANG_LIB@/lib/clang/12.0.1/include" \
+		-rtlib=compiler-rt \
+		-resource-dir="@COMPILER_RT@" \
+		-L-user-start \
+		-Xclang \
+		-disable-llvm-passes \
+		$sflags \
+		"$@" \
+		$eflags \
+		-L"@MUSL@/lib" \
+		-L-user-end
+fi

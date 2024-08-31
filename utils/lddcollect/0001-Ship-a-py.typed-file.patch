@@ -1,0 +1,30 @@
+From ade464ad86c5cc94a85b026d7e3c550d8edef66d Mon Sep 17 00:00:00 2001
+Date: Wed, 18 Jan 2023 15:44:37 -0600
+Subject: [PATCH] Ship a py.typed file.
+
+---
+ lddcollect/py.typed | 0
+ setup.cfg           | 3 +++
+ 2 files changed, 3 insertions(+)
+ create mode 100644 lddcollect/py.typed
+
+diff --git a/lddcollect/py.typed b/lddcollect/py.typed
+new file mode 100644
+index 0000000..e69de29
+diff --git a/setup.cfg b/setup.cfg
+index 9e82836..0766cce 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -38,6 +38,9 @@ dev =
+ test =
+   pytest
+ 
++[options.package_data]
++lddcollect = py.typed
++
+ [bdist_wheel]
+ universal = true
+ 
+-- 
+2.38.1
+

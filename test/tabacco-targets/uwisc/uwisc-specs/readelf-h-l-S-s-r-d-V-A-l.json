@@ -1,0 +1,16 @@
+{
+  "args": [
+    null,
+    "-h",
+    "-l",
+    "-S",
+    "-s",
+    "-r",
+    "-d",
+    "-V",
+    "-A",
+    "-l"
+  ],
+  "more_args": false,
+  "config_files": []
+}

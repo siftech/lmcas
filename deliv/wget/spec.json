@@ -1,0 +1,27 @@
+{
+  "binary": "/root/wget-1.21.3/src/wget",
+  "configs": [
+    {
+      "args": ["wget", "--method=GET", "-O-"],
+      "env": {
+        "CWD": "/",
+        "PATH": "/bin"
+      },
+      "cwd": "/",
+      "syscall_mocks": {
+        "sys_open": {
+          "mapping": {
+            "/etc/passwd": "passwd",
+            "/home/debloatuser/.wgetrc": "wgetrc"
+          }
+        },
+        "sys_stat": {
+          "mapping": {
+            "/etc/passwd": "passwd",
+            "/home/debloatuser/.wgetrc": "wgetrc"
+          }
+        }
+      }
+    }
+  ]
+}

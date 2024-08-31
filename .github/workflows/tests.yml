@@ -1,0 +1,49 @@
+---
+name: tests
+on: push
+
+env:
+  DOCKER_CONTAINER_REGISTRY_TOKEN: ${{ secrets.DOCKER_CONTAINER_REGISTRY_TOKEN }}
+
+jobs:
+  build-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Run flake check
+        run: nix flake check
+
+      - name: Create results dir
+        run: mkdir -p ./result ./test/results
+
+      - name: Build tests
+        run: ./test/build-tests --result-dir ./result
+      
+  #     - name: Upload results dir
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: build-results
+  #         path: ./result
+
+  # # The reason this is split out into a separate test is because it needs to use a different container image
+  # run-tests:
+  #   runs-on: ubuntu-latest
+  #   needs: [build-tests]
+  #   container: ghcr.io/siftech/lmcas-test:test
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - name: Download results dir
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: build-results
+  #         path: ./result
+
+  #     - name: Lol
+  #       run: pwd && ls -l && ls -l result
+
+      - name: Run tests
+        run: ./ci/github-actions-run-tests.sh

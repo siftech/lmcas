@@ -1,0 +1,17 @@
+[wget]
+
+[wget.tests.test_get]
+kind = "simple-run"
+args = ["--method=get", "-O-", "http://127.0.0.1:12347/foo/bar/get"]
+fixtures = ["wget_server_get"]
+expected_stdout = """
+Hello from the wget GET test
+"""
+
+[wget.tests.test_post]
+kind = "simple-run"
+args = ["--method=post", "-O-", "--body-data={\"title\": \"Wget POST\",\"body\": \"Wget POST example body\",\"userId\":1}", "http://127.0.0.1:12347/foo/bar/post"]
+fixtures = ["wget_server_post"]
+expected_stdout = """
+Hello from the wget POST test
+"""

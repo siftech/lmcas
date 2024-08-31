@@ -1,0 +1,89 @@
+do "./defaults.pl" || die "Can't do './defaults.pl': $@";
+
+
+do "./lmcas.pl" || die "Can't do './lmcas.pl': $@";
+do "./zlib.pl" || die "Can't do './zlib.pl': $@";
+
+do "./common.pl" || die "Can't do './common.pl': $@";
+
+use PRT::LineComparo;
+
+$test = {
+    defaultIgnore => 0,
+    keywords => [ qw / neckminer tabacco tutorial / ],
+    cleanup => \&killer,
+    agents => [
+    	&printenv,
+    	&print_results_dir,
+    	#@kill_my_dockers,
+    	#@kill_stray_local_processes,	# this will get the mp-oprs if run locally
+	@start_lmcas_container,
+        @build_zlib,
+
+    	echo("dropbear: starting configure and make"),
+    	{
+          name         => "configure-and-make-dropbear",
+          command      => [ "timeout","3m","$ENV{'PRT_PATH'}/timestamp","docker","exec","lmcas","bash","-c",'tar xf /usr/src/dropbear-2020.81.tar.bz2; cd dropbear-2020.81; ./configure --enable-static; make -j $(nproc) -l $(nproc)',
+                          ],
+          comparo      => undef,
+          complete_before_continuing =>1,
+        },
+	echo("Copying dropbear ssh host key..."),
+	{
+	  name	       => "copy-ssh-host-key",
+	  command      => ["docker", "exec", "lmcas", "bash", "-c", "mkdir - p /etc/dropbear; cp /root/.ssh/dropbear_ed25519_host_key /etc/dropbear"],
+	  comparo      => undef,
+	  complete_before_continuing => 1,
+	},
+    	echo("Debloating dropbear with spec..."), 
+	{	# this one we just make sure it returns zero... the output of tabacco changes too much to check it
+          name         => "tabacco-debloated",
+          command      => [ "timeout","2m","$ENV{'PRT_PATH'}/timestamp","docker","exec","lmcas","bash","-c", "cd dropbear; tabacco -o debloated spec.json" ],
+	  comparo      => undef,
+	  complete_before_continuing =>1,
+    	},
+    	echo("Testing debloated program"), 
+	{ name         => "dropbear-debloated",
+          command      => [ "docker","exec","lmcas","bash","-c","cd dropbear; ./debloated" ], 
+	  exit_code    => 100},
+	{ name         => "dropbear-debloated-correct-flags-1",
+          command      => [ "docker","exec","lmcas","bash","-c","cd dropbear; ./debloated -w -j -E -F -R -I 60 &" ],
+	  comparo      => new PRT::LineComparo(key_fact_regexp => "root login rejected")},
+	{ name         => "dropbear-debloated-ssh",
+         command      => [ "docker","exec","lmcas","bash","-c","cd dropbear; ssh -o PasswordAuthentication=no root\@localhost 'echo $$'" ],
+	  exit_code    => 255,
+	  complete_before_continuing => 1},
+	{ name         => "kill-debloated",
+          command      => [ "docker","exec","lmcas","bash","-c", "pkill debloated" ], 
+	  comparo      => undef,
+	  complete_before_continuing =>1},
+	{ name         => "dropbear-debloated-correct-flags-2",
+          command      => [ "docker","exec","lmcas","bash","-c","cd dropbear; ./debloated -j -E -F -R -I 60 -c uptime &" ],
+	  comparo      => new PRT::LineComparo(key_fact_regexp => "Pubkey auth succeeded for 'root' with key")},
+	{ name         => "dropbear-debloated-uptime-ssh",
+         command      => [ "docker","exec","lmcas","bash","-c","ssh -o PasswordAuthentication=no root\@localhost 'echo $$'" ],
+	 comparo       => new PRT::LineComparo(key_fact_regexp => "users,  load average:"),
+	 complete_before_continuing => 1},
+	{ name         => "kill-debloated",
+          command      => [ "docker","exec","lmcas","bash","-c", "pkill debloated" ], 
+	  comparo      => undef,
+	  complete_before_continuing =>1},
+    	echo("Debloating with -N to test original functionality..."), 
+	{	# this one we just make sure it returns zero... the output of tabacco changes too much to check it
+          name         => "tabacco-nondebloated",
+          command      => [ "timeout","2m","$ENV{'PRT_PATH'}/timestamp","docker","exec","lmcas","bash","-c", "cd dropbear; tabacco -o nondebloated -N spec.json" ],
+	  comparo      => undef,
+	  complete_before_continuing =>1,
+    	},
+    	echo("Testing nondebloated program"), 
+	{ name         => "dropbear-nondebloated",
+          command      => [ "docker","exec","lmcas","bash","-c","cd dropbear; ./nondebloated -F -E -R &" ],
+	  comparo      => new PRT::LineComparo(key_fact_regexp => "Pubkey auth succeeded for 'root' with key")},
+	{ name         => "dropbear-nondebloated-ssh",
+          command      => [ "docker","exec","lmcas","bash","-c","ssh root\@localhost 'echo $$'" ],
+	  comparo      => undef},
+        echo("Test complete!")
+	],
+};
+
+$test;

@@ -1,0 +1,21 @@
+--- a/svr-main.c	2023-01-26 20:10:21.683640270 +0000
++++ b/svr-main.c	2023-01-26 20:14:57.667107803 +0000
+@@ -43,6 +43,9 @@
+ #endif
+ static void commonsetup(void);
+ 
++__attribute__((noinline))
++static void _lmcas_neck(void) {}
++
+ #if defined(DBMULTI_dropbear) || !DROPBEAR_MULTI
+ #if defined(DBMULTI_dropbear) && DROPBEAR_MULTI
+ int dropbear_main(int argc, char ** argv)
+@@ -58,6 +61,7 @@
+ 	/* get commandline options */
+ 	svr_getopts(argc, argv);
+ 
++	_lmcas_neck();
+ #if INETD_MODE
+ 	/* service program mode */
+ 	if (svr_opts.inetdmode) {
+

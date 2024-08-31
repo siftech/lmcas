@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Get the absolute directory of the LMCAS repo.
+lmcas_code_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." &> /dev/null \
+	&& pwd)"
+
+# Ensure that the dev shell container is up.
+container_name=$("$lmcas_code_dir/tools/host/lmcas-ensure-dev-shell")
+
+# Collect the flags to use.
+docker_exec_flags=()
+
+# If we have a tty on stdin, spawn one for the container too.
+if [[ -t 0 ]]; then
+	docker_exec_flags+=(--tty)
+fi
+
+# Collect the command to use.
+docker_exec_command=(bash --init-file /code/etc/env.sh)
+if [[ "$#" != 0 ]]; then
+	docker_exec_command=("$@")
+fi
+
+# Start Docker.
+exec docker exec \
+	--env=IN_LMCAS_CONTAINER=1 \
+	--interactive \
+	--workdir=/code \
+	"${docker_exec_flags[@]}" \
+	"$container_name" \
+	"${docker_exec_command[@]}"

@@ -1,0 +1,219 @@
+TODO: Convert this to an example in the python.
+TODO: The visit_func should also have passed to it a merge function to merge
+multiple paths returned from a contribution, if there are multiple paths.
+TODO: The reach.py code must search the instruction stream of ALL basic blocks
+it encounters, choke point or not, to ensure that proper statistics are
+being kept.
+
+CP = Choke Point
+EP = End Path
+
+int main(void)
+{
+    int x = bar();  // mbb0 ICP; succeedsLoops: 0, maxGetoptsPassed: 0
+
+    if (x) {        // mbb1; succeedsLoops: 0, maxGetoptsPassed: 0
+                    // what if ncp0() called foo? We ignore this knowledge!
+        ncp0();     // mbb2; succeedsLoops: 0, maxGetoptsPassed: 0
+    } else {
+        ncp1();     // mbb3 EP; succeedsLoops: 0, maxGetoptsPassed: 0
+        return 1;
+    }
+
+RR2 cp0();          // mbb4 CP; succeedsLoops: 0, maxGetoptsPassed: 0
+
+    if (x) {        // mbb5; succeedsLoops: 0, maxGetoptsPassed: 0
+        ncp0();     // mbb6; succeedsLoops: 0, maxGetoptsPassed: 0
+    } else {
+        ncp1();     // mbb7 EP; succeedsLoops: 0, maxGetoptsPassed: 0
+        return 1;
+    }
+
+    return 0;       // mbb8 EP; succeedsLoops: 0, maxGetoptsPassed: 0
+}
+
+int bar(void)
+{
+    int x, i;
+
+    x = foo();          // bbb0 ICP; succeedsLoops: 0, maxGetoptsPassed: 0
+
+    if (x) {            // bbb1; succeedsLoops: 0, maxGetoptsPassed: 0
+        ncp0();         // bbb2; succeedsLoops: 0, maxGetoptsPassed: 0
+    } else {
+        ncp1();         // bbb3 EP; succeedsLoops: 0, maxGetoptsPassed: 0
+        return -1;
+    }
+
+    cp0();              // bbb4 CP; succeedsLoops: 0, maxGetoptsPassed: 0
+
+    while(getopt()) {   // bbb5; succeedsLoops: 0, maxGetoptsPassed: 0
+        work();         // bbb6; succeedsLoops: 1, maxGetoptsPassed: 1
+    }
+
+    i = 0;              // bbb7 CP; succeedsLoops: 1, maxGetopsPassed: 1
+    while (i < x) {     // bbb1; succeedsLoops: 1, maxGetoptsPassed: 1
+        work();         // bbb9; succeedsLoops: 2, maxGetoptsPassed: 1
+        i++;
+    }
+
+    cp0();              // bbb10 CP; succeedsLoops: 2, maxGetopsPassed: 1
+    x = foo(); 
+
+    if (x) {            // bbb11; succeedsLoops: 2, maxGetoptsPassed: 1
+        ncp0();         // bbb12; succeedsLoops: 2, maxGetoptsPassed: 1
+    } else {
+        ncp1();         // bbb13 EP; succeedsLoops: 2, maxGetoptsPassed: 1
+        return -1;
+    }
+
+    while(getopt()) {   // bbb14; succeedsLoops: 2, maxGetoptsPassed: 1
+        work();         // bbb15; succeedsLoops: 3, maxGetoptsPassed: 2
+    }
+
+    if (x) {            // bbb16; succeedsLoops: 3, maxGetoptsPassed: 2
+        ncp0();         // bbb17; succeedsLoops: 3, maxGetoptsPassed: 2
+    } else {
+        ncp1();         // bbb18 EP; succeedsLoops: 3, maxGetoptsPassed: 2
+        return -1;
+    }
+
+RR1 cp0();              // bbb19 CP; succeedsLoops: 3, maxGetopsPassed: 2
+
+    if (x) {            // bbb20; succeedsLoops: 3, maxGetoptsPassed: 2
+        ncp0();         // bbb21; succeedsLoops: 3, maxGetoptsPassed: 2
+    } else {
+        ncp1();         // bbb22 EP; succeedsLoops: 3, maxGetoptsPassed: 2
+        return -1;
+    }
+
+    cp0();              // bbb23 EP; succeedsLoops: 3: maxGetopsPassed: 2
+    return 0;
+}
+
+int foo(void)
+{
+    int x, y;
+    
+    while(getopt()) {   // fbb0; succeedsLoops: 0, maxGetoptsPassed: 0
+        work();         // fbb1; succeedsLoops: 1, maxGetoptsPassed: 1
+    }
+
+    if (x) {            // fbb2; succeedsLoops: 1, maxGetoptsPassed: 1
+        y = ncp0();     // fbb3; succeedsLoops: 1, maxGetoptsPassed: 1
+    } else {
+        y = ncp1();     // fbb4 EP; succeedsLoops: 1, maxGetoptsPassed: 1
+        return -1;
+    }
+
+    y += cp1();         // fbb5 ICP EP; succeedsLoops: 1, maxGetopsPassed: 1
+    return y;
+}
+
+int cp0(void)
+{
+    return 0;           // cp0bb0 CP EP; succeedsLoops: 0, maxGetopsPassed: 0
+}
+
+int cp1(void)
+{
+    int x;
+
+    x = 0;              // cp1bb0 CP; succeedsLoops: 0, maxGetopsPassed: 0
+    while(getopt()) {   // cp1bb1; succeedsLoops: 0, maxGetoptsPassed: 0
+        work();         // cp1bb2; succeedsLoops: 1, maxGetoptsPassed: 1
+        x++;
+    }
+
+RR0 x += 1;             // cp1bb3 CP EP; succeedsLoops: 1, maxGetopsPassed: 1
+    return x; 
+}
+
+int ncp0(void)
+{   
+    return 0;           // ncp0bb0 CP EP; succeedsLoops: 0, maxGetopsPassed: 0
+}
+
+int ncp1(void)
+{
+    return 0;           // ncp1bb0 CP EP; succeedsLoops: 0, maxGetopsPassed: 0
+}
+
+void work(void)
+{
+    return;             // wbb0 CP; succeedsLoops: 0, maxGetopsPassed: 0
+}
+
+
+succeedsAllGetopts:
+    This property is only meaningful within the search of a function
+    so we can determine that a choke point ina function is after all getopt()
+    calls. 
+    So far, we declare this to be useless.
+
+
+Consider a deep path (encountered first):
+----------------------
+
+A B C D : pass/LLVM computed attributes for the basic block.
+A_* B_* C_* D_* : summed contributions of callees in the basic block.
+
+(main:
+  mbb0 A { A_C0 : { } }
+    (bar:
+      bbb0 B { B_C0 : { } } // called foo
+        (foo:
+            fbb0 C { C_C0 : { } },
+            fbb1 C { C_C1 : { } },
+            fbb2 C { C_C2 : { } },
+            fbb4 C { C_C3 : { } },
+                (cp2: 
+                    cp2bb0 D { D_C0 : { } },
+                    cp2bb1 D { D_C1 : { } })))
+
+Compute the totals of what cp2bb1 represents in the path. (visit_func does this)
+X = (D + (D_C1 + D_C0)) +
+    (C + (C_C3 + C_C2 + C_C1 + C_C0)) +
+    (B + (B_C0)) +
+    (A + (A_C0))
+
+TODO: Ensure the above computes the right thing, does it have all of the
+attributes specified in the data structure correctly?
+
+
+TODO: Annotate the below given the above depth version.
+
+Consider a shallow path (encountered later):
+----------------------
+
+(main:
+  mbb0 A { }
+  (bar:
+    // what was summarized into here from the first call to foo()?
+    bbb0 A { maxGetoptsPassed : 2}, // ONLY the synthesis from the child foo()
+    bbb1 A { },
+    bbb2 A { },
+    // what was summarized into here from the second call to foo()?
+    bbb4 A { }))
+
+
+(main:
+  mbb0 A { }
+    (bar:
+      // what was summarized into here from the first call to foo()?
+      bbb0 A { maxGetoptsPassed : 4}, // ONLY the synthesis from the child foo()
+      bbb1 A { },
+      bbb2 A { },
+      // what was summarized into here from the second call to foo()?
+      bbb4 A { maxGetoptsPassed : 2}, // ONLY the synthesis from the child doo()
+      bbb5 A { },
+      bbb6 A { },
+      bbb8 A { },
+      bbb9 A { },
+      bbb10 A { },
+      // we search the path, visit_func must sum the maxGet.. and get ?
+      bbb12 A { }))
+
+
+
+------------------------------------------------------------------------

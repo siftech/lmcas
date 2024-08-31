@@ -1,0 +1,1 @@
+USAGE: wget --method=GET -O- [ARGS...]

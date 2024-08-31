@@ -1,0 +1,6 @@
+77a78,80
+> __attribute__((noinline))
+> void _lmcas_neck() {}
+> 
+5445a5449
+>     _lmcas_neck();

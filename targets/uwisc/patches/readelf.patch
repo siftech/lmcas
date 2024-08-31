@@ -1,0 +1,240 @@
+4710a4711,4714
+> 
+> __attribute__((noinline))
+> void _lmcas_neck() {}
+> 
+4920c4924
+< 
+---
+>     _lmcas_neck();
+4937a4942
+> 
+21062c21067,21292
+<   parse_args (& cmdline, argc, argv);
+---
+>   //parse_args (& cmdline, argc, argv);
+>     int c;
+> 
+>   if (argc < 2)
+>     usage (stderr);
+> 
+>   while ((c = getopt_long
+>     (argc, argv, "ACDHILNR:STVWacdeghi:lnp:rstuvw::x:z", options, NULL)) != EOF)
+>     {
+>       switch (c)
+>   {
+>   case 0:
+>     /* Long options.  */
+>     break;
+>   case 'H':
+>     usage (stdout);
+>     break;
+> 
+>   case 'a':
+>     do_syms = TRUE;
+>     do_reloc = TRUE;
+>     do_unwind = TRUE;
+>     do_dynamic = TRUE;
+>     do_header = TRUE;
+>     do_sections = TRUE;
+>     do_section_groups = TRUE;
+>     do_segments = TRUE;
+>     do_version = TRUE;
+>     do_histogram = TRUE;
+>     do_arch = TRUE;
+>     do_notes = TRUE;
+>     break;
+> 
+>   case 'g':
+>     do_section_groups = TRUE;
+>     break;
+>   case 't':
+>   case 'N':
+>     do_sections = TRUE;
+>     do_section_details = TRUE;
+>     break;
+>   case 'e':
+>     do_header = TRUE;
+>     do_sections = TRUE;
+>     do_segments = TRUE;
+>     break;
+>   case 'A':
+>     do_arch = TRUE;
+>     break;
+>   case 'D':
+>     do_using_dynamic = TRUE;
+>     break;
+>   case 'r':
+>     do_reloc = TRUE;
+>     break;
+>   case 'u':
+>     do_unwind = TRUE;
+>     break;
+>   case 'h':
+>     do_header = TRUE;
+>     break;
+>   case 'l':
+>     do_segments = TRUE;
+>     break;
+>   case 's':
+>     do_syms = TRUE;
+>     break;
+>   case 'S':
+>     do_sections = TRUE;
+>     break;
+>   case 'd':
+>     do_dynamic = TRUE;
+>     break;
+>   case 'I':
+>     do_histogram = TRUE;
+>     break;
+>   case 'n':
+>     do_notes = TRUE;
+>     break;
+>   case 'c':
+>     do_archive_index = TRUE;
+>     break;
+>   case 'L':
+>     do_checks = TRUE;
+>     break;
+>   case 'x':
+>     request_dump (/*dumpdata*/&cmdline, HEX_DUMP);
+>     break;
+>   case 'p':
+>     request_dump (/*dumpdata*/&cmdline, STRING_DUMP);
+>     break;
+>   case 'R':
+>     request_dump (/*dumpdata*/&cmdline, RELOC_DUMP);
+>     break;
+>   case 'z':
+>     decompress_dumps = TRUE;
+>     break;
+>   case 'w':
+>     do_dump = TRUE;
+>     if (optarg == 0)
+>       {
+>         do_debugging = TRUE;
+>         dwarf_select_sections_all ();
+>       }
+>     else
+>       {
+>         do_debugging = FALSE;
+>         dwarf_select_sections_by_letters (optarg);
+>       }
+>     break;
+>   case OPTION_DEBUG_DUMP:
+>     do_dump = TRUE;
+>     if (optarg == 0)
+>       do_debugging = TRUE;
+>     else
+>       {
+>         do_debugging = FALSE;
+>         dwarf_select_sections_by_names (optarg);
+>       }
+>     break;
+>   case OPTION_DWARF_DEPTH:
+>     {
+>       char *cp;
+> 
+>       dwarf_cutoff_level = strtoul (optarg, & cp, 0);
+>     }
+>     break;
+>   case OPTION_DWARF_START:
+>     {
+>       char *cp;
+> 
+>       dwarf_start_die = strtoul (optarg, & cp, 0);
+>     }
+>     break;
+>   case OPTION_DWARF_CHECK:
+>     dwarf_check = TRUE;
+>     break;
+>   case OPTION_CTF_DUMP:
+>     do_ctf = TRUE;
+>     request_dump (/*dumpdata*/&cmdline, CTF_DUMP);
+>     break;
+>   case OPTION_CTF_SYMBOLS:
+>     free (dump_ctf_symtab_name);
+>     dump_ctf_symtab_name = strdup (optarg);
+>     break;
+>   case OPTION_CTF_STRINGS:
+>     free (dump_ctf_strtab_name);
+>     dump_ctf_strtab_name = strdup (optarg);
+>     break;
+>   case OPTION_CTF_PARENT:
+>     free (dump_ctf_parent_name);
+>     dump_ctf_parent_name = strdup (optarg);
+>     break;
+>   case OPTION_DYN_SYMS:
+>     do_dyn_syms = TRUE;
+>     break;
+> #ifdef SUPPORT_DISASSEMBLY
+>   case 'i':
+>     request_dump (/*dumpdata*/&cmdline, DISASS_DUMP);
+>     break;
+> #endif
+>   case 'v':
+>     print_version (program_name);
+>     break;
+>   case 'V':
+>     do_version = TRUE;
+>     break;
+>   case 'W':
+>     do_wide = TRUE;
+>     break;
+>   case 'T':
+>     do_not_show_symbol_truncation = TRUE;
+>     break;
+>   case 'C':
+>     do_demangle = TRUE;
+>     if (optarg != NULL)
+>       {
+>         enum demangling_styles style;
+> 
+>         style = cplus_demangle_name_to_style (optarg);
+>         if (style == unknown_demangling)
+>     error (_("unknown demangling style `%s'"), optarg);
+> 
+>         cplus_demangle_set_style (style);
+>       }
+>     break;
+>   case OPTION_NO_DEMANGLING:
+>     do_demangle = FALSE;
+>     break;
+>   case OPTION_RECURSE_LIMIT:
+>     demangle_flags &= ~ DMGL_NO_RECURSE_LIMIT;
+>     break;
+>   case OPTION_NO_RECURSE_LIMIT:
+>     demangle_flags |= DMGL_NO_RECURSE_LIMIT;
+>     break;
+>   case OPTION_WITH_SYMBOL_VERSIONS:
+>     /* Ignored for backward compatibility.  */
+>     break;
+>     
+>   default:
+>     /* xgettext:c-format */
+>     error (_("Invalid option '-%c'\n"), c);
+>     /* Fall through.  */
+>   case '?':
+>     usage (stderr);
+>   }
+>     }
+>     _lmcas_neck();
+>   if (!do_dynamic && !do_syms && !do_reloc && !do_unwind && !do_sections
+>       && !do_segments && !do_header && !do_dump && !do_version
+>       && !do_histogram && !do_debugging && !do_arch && !do_notes
+>       && !do_section_groups && !do_archive_index
+>       && !do_dyn_syms)
+>     {
+>       if (do_checks)
+>   {
+>     check_all = TRUE;
+>     do_dynamic = do_syms = do_reloc = do_unwind = do_sections = TRUE;
+>     do_segments = do_header = do_dump = do_version = TRUE;
+>     do_histogram = do_debugging = do_arch = do_notes = TRUE;
+>     do_section_groups = do_archive_index = do_dyn_syms = TRUE;
+>   }
+>       else
+>   usage (stderr);
+>     }
+> 

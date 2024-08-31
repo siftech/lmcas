@@ -1,0 +1,20 @@
+diff --git a/shared/parser.go b/shared/parser.go
+index 5a280fe..53718e5 100644
+--- a/shared/parser.go
++++ b/shared/parser.go
+@@ -192,6 +192,7 @@ func Parse(argList []string) ParserResult {
+ 		"-integrated-as":         {0, pr.compileUnaryCallback},
+ 		"-no-canonical-prefixes": {0, pr.compileLinkUnaryCallback},
+ 
++		"-resource-dir": {1, pr.compileLinkBinaryCallback},
+ 		"--sysroot": {1, pr.compileLinkBinaryCallback}, //iam: musl stuff
+ 
+ 		//<archaic flags>
+@@ -381,6 +382,7 @@ func Parse(argList []string) ParserResult {
+ 		{`^-std=.+$`, flagInfo{0, pr.compileUnaryCallback}},
+ 		{`^-stdlib=.+$`, flagInfo{0, pr.compileLinkUnaryCallback}},
+ 		{`^-mtune=.+$`, flagInfo{0, pr.compileUnaryCallback}},
++		{`^-resource-dir=.+$`, flagInfo{0, pr.compileLinkUnaryCallback}}, //both compile and link time
+ 		{`^--sysroot=.+$`, flagInfo{0, pr.compileLinkUnaryCallback}}, //both compile and link time
+ 		{`^-print-.*$`, flagInfo{0, pr.compileUnaryCallback}},        // generic catch all for the print commands
+ 		{`^-mmacosx-version-min=.+$`, flagInfo{0, pr.compileLinkUnaryCallback}},

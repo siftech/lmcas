@@ -1,0 +1,226 @@
+{
+    "module-defaults": {
+        "taint-config": "config/cmd-tool-config.json",
+        "function-local-points-to-info-wo-globals": true,
+        "use-simplified-dfa": true,
+        "timeout-duration": "10m",
+        "timeout-kill-after": "5m"
+    },
+    "modules": [
+        {
+            "path": "external/slash-dataset/curl.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/curl.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/date.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/date.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/diff.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/diff.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/dnsproxy.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/dnsproxy.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/du.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/du.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/echo.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/echo.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/gzip.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/gzip.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/httpd.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/httpd.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/id.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/id.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/kill.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/kill.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/knock.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/knock.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/knockd.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/knockd.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/lighttpd.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/lighttpd.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/mini_httpd.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/mini_httpd.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/named.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/named.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/nginx.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/nginx.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/objdump.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/objdump.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/psql.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/psql.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/readelf.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/readelf.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/sort.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/sort.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/tcpdump.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/tcpdump.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/uniq.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/uniq.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/wc.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/wc.ll",
+			"use-simplified-dfa": false
+        },
+
+        {
+            "path": "external/slash-dataset/wget.ll",
+			"use-simplified-dfa": true
+        },
+        {
+            "path": "external/slash-dataset/wget.ll",
+			"use-simplified-dfa": false
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+cd "$LMCAS_CODE"
+rev=$(nix eval \
+	--expr '(builtins.fromJSON (builtins.readFile ./flake.lock)).nodes.nixpkgs.locked.rev' \
+	--impure \
+	--raw)
+echo "github:NixOS/nixpkgs?rev=${rev}";

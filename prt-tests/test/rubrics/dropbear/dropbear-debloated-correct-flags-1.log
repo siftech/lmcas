@@ -1,0 +1,4 @@
+[11835] Apr 21 15:00:26 Not backgrounding
+[11842] Apr 21 15:00:26 Child connection from 127.0.0.1:49350
+[11842] Apr 21 15:00:26 root login rejected
+[11842] Apr 21 15:00:26 Exit before auth from <127.0.0.1:49350>: (user 'root', 0 fails): Exited normally

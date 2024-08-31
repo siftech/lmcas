@@ -1,0 +1,40 @@
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main(int argc, char **argv) {
+  enum { MODE_INVALID, MODE_HELLO, MODE_LS } mode = MODE_INVALID;
+
+  int opt;
+  while ((opt = getopt(argc, argv, "hl")) != -1) {
+    switch (opt) {
+    case 'h':
+      mode = MODE_HELLO;
+      break;
+    case 'l':
+      mode = MODE_LS;
+      break;
+    default:
+      fprintf(stderr, "Usage: %s <-h|-l>\n", argv[0]);
+      return -1;
+    }
+  }
+
+  int nurls = argc - optind;
+
+  switch (mode) {
+  case MODE_HELLO:
+    puts("Hello, world!");
+    for (int i = 0; i < nurls; i++)
+      puts(argv[optind + i]);
+    break;
+  case MODE_LS:
+    return system("ls");
+  default:
+    fprintf(stderr, "Error: invalid mode\n");
+    return 1;
+  }
+
+  return 0;
+}
